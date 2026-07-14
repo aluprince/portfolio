@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alu Prince — Backend Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090f;
+  --surface:#111119;
+  --surface2:#17171f;
+  --border:#1f1f2e;
+  --border2:#2a2a3e;
+  --text:#e4e4ec;
+  --muted:#56566e;
+  --muted2:#3a3a52;
+  --accent:#00e5a0;
+  --accent2:#0066ff;
+  --accent-dim:rgba(0,229,160,0.08);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:rgba(9,9,15,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.08em}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+
+.hero-wrap{max-width:1100px;margin:0 auto;padding:120px 48px 80px;min-height:100vh;display:flex;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;width:100%}
+.hero-tag{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--accent)}
+h1{font-size:clamp(36px,4.5vw,62px);font-weight:300;line-height:1.08;letter-spacing:-.03em;margin-bottom:22px}
+h1 strong{font-weight:600;color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);max-width:460px;margin-bottom:36px;font-weight:300;line-height:1.8}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;font-family:var(--mono);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.06em;transition:all .2s;cursor:pointer;border:none}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{opacity:.85}
+.btn-ghost{border:1px solid var(--border2);color:var(--muted);background:transparent}
+.btn-ghost:hover{border-color:var(--muted);color:var(--text)}
+
+.chat-widget{background:var(--surface);border:1px solid var(--border2);overflow:hidden;height:400px;display:flex;flex-direction:column}
+.chat-header{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.chat-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.chat-title{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em}
+.chat-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-msgs::-webkit-scrollbar{width:2px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2)}
+.msg{max-width:88%;font-size:13px;line-height:1.6;padding:9px 13px}
+.msg-ai{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:0 8px 8px 8px;align-self:flex-start}
+.msg-user{background:var(--accent-dim);border:1px solid rgba(0,229,160,.12);color:var(--text);border-radius:8px 0 8px 8px;align-self:flex-end;font-family:var(--mono);font-size:12px}
+.msg-dim{color:var(--muted);font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px}
+.chip{font-family:var(--mono);font-size:10px;color:var(--muted);border:1px solid var(--border2);padding:4px 9px;cursor:pointer;transition:all .2s;background:none}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chat-foot{padding:10px;border-top:1px solid var(--border);display:flex;gap:7px}
+.chat-in{flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;outline:none;resize:none;transition:border-color .2s}
+.chat-in:focus{border-color:rgba(0,229,160,.35)}
+.chat-in::placeholder{color:var(--muted)}
+.chat-btn{background:var(--accent);color:#000;border:none;padding:8px 13px;font-family:var(--mono);font-size:11px;cursor:pointer;font-weight:500;transition:opacity .2s;flex-shrink:0}
+.chat-btn:hover{opacity:.85}
+.chat-btn:disabled{opacity:.35;cursor:not-allowed}
+
+.ticker{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:11px 0;overflow:hidden;white-space:nowrap;background:var(--surface)}
+.ticker-inner{display:inline-flex;gap:52px;animation:tick 28s linear infinite}
+.ti{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.ti span{color:var(--accent);margin-right:5px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.section{padding:88px 48px;max-width:1100px;margin:0 auto}
+.slabel{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:44px;display:flex;align-items:center;gap:12px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border);max-width:160px}
+h2{font-size:clamp(24px,3.2vw,38px);font-weight:300;letter-spacing:-.02em;margin-bottom:12px}
+
+.about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:start}
+.about-text p{color:var(--muted);margin-bottom:16px;font-weight:300;line-height:1.82;font-size:15px}
+.about-text p strong{color:var(--text);font-weight:500}
+.stack-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.si{padding:13px 15px;background:var(--surface);border:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:.02em}
+.si:hover{border-color:var(--accent);color:var(--text)}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dg{background:var(--accent)}.db{background:var(--accent2)}.dd{background:var(--muted2)}
+
+.pcard{border:1px solid var(--border);background:var(--surface);padding:34px;margin-bottom:2px;position:relative;transition:border-color .2s}
+.pcard:hover{border-color:rgba(0,229,160,.22)}
+.pcard.feat::before{content:'FEATURED';position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.15em;border:1px solid var(--accent);padding:2px 7px}
+.plang{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;margin-bottom:12px}
+.pcard h3{font-size:19px;font-weight:500;margin-bottom:9px;letter-spacing:-.01em}
+.pcard p{color:var(--muted);font-size:14px;line-height:1.75;margin-bottom:20px;max-width:620px}
+.ptags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:22px}
+.tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:3px 8px;letter-spacing:.03em}
+.plinks{display:flex;gap:16px}
+.plinks a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;letter-spacing:.05em;transition:opacity .2s}
+.plinks a:hover{opacity:.65}
+
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.dcard{background:var(--surface);border:1px solid var(--border);padding:26px}
+.dlbl{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:9px}
+.dcard h4{font-size:14px;font-weight:500;margin-bottom:7px}
+.dcard p{font-size:13px;color:var(--muted);line-height:1.7}
+code{font-family:var(--mono);font-size:11px;background:var(--bg);border:1px solid var(--border);padding:1px 5px;color:var(--accent)}
+
+.cwrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.clinks{display:flex;flex-direction:column;gap:3px}
+.clink{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:all .2s}
+.clink:hover{border-color:var(--accent);background:var(--accent-dim)}
+.clbl{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.cval{font-size:13px;color:var(--text)}
+.carr{color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center}
+footer p{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  .hero-wrap{padding:90px 20px 60px}
+  .hero-grid,.about-grid,.dgrid,.cwrap{grid-template-columns:1fr;gap:36px}
+  .section{padding:60px 20px}
+  footer{padding:18px 20px;flex-direction:column;gap:8px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">alu.prince</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#decisions">Decisions</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="hero-wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag">Backend Engineer · Nigeria</div>
+      <h1>I build backends<br>that <strong>hold up</strong><br>under pressure.</h1>
+      <p class="hero-sub">Go and Python for APIs, data pipelines, AI integrations, and financial systems. I focus on correctness, reliability, and code that does what it says.</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Work →</a>
+        <a href="mailto:aluprince03@gmail.com" class="btn btn-ghost">aluprince03@gmail.com</a>
+      </div>
+    </div>
+
+    <div class="chat-widget">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <span class="chat-title">ASK ABOUT ALU</span>
+        <span class="chat-sub">AI · Groq</span>
+      </div>
+      <div class="chat-msgs" id="msgs">
+        <div class="msg msg-ai">Hey 👋 I know Alu's background, skills, and projects. Ask me anything — what he builds, what languages he uses, whether he'd be a good fit for your team.</div>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip" onclick="chip(this)">What can he build?</button>
+        <button class="chip" onclick="chip(this)">Go or Python?</button>
+        <button class="chip" onclick="chip(this)">AI experience?</button>
+        <button class="chip" onclick="chip(this)">Available for hire?</button>
+      </div>
+      <div class="chat-foot">
+        <textarea class="chat-in" id="cin" placeholder="Ask about skills, projects, availability..." rows="1" onkeydown="hk(event)"></textarea>
+        <button class="chat-btn" id="cbtn" onclick="send()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ti"><span>Go</span>REST APIS</span>
+    <span class="ti"><span>→</span>RAG PIPELINES</span>
+    <span class="ti"><span>Py</span>SEMANTIC SEARCH</span>
+    <span class="ti"><span>→</span>EMBEDDING MODELS</span>
+    <span class="ti"><span>Go</span>WEB SCRAPING</span>
+    <span class="ti"><span>→</span>LLM INTEGRATION</span>
+    <span class="ti"><span>Go</span>DOUBLE-ENTRY LEDGER</span>
+    <span class="ti"><span>→</span>ATOMIC TRANSACTIONS</span>
+    <span class="ti"><span>Py</span>VECTOR DATABASES</span>
+    <span class="ti"><span>→</span>IDEMPOTENCY KEYS</span>
+    <span class="ti"><span>Go</span>REST APIS</span>
+    <span class="ti"><span>→</span>RAG PIPELINES</span>
+    <span class="ti"><span>Py</span>SEMANTIC SEARCH</span>
+    <span class="ti"><span>→</span>EMBEDDING MODELS</span>
+    <span class="ti"><span>Go</span>WEB SCRAPING</span>
+    <span class="ti"><span>→</span>LLM INTEGRATION</span>
+    <span class="ti"><span>Go</span>DOUBLE-ENTRY LEDGER</span>
+    <span class="ti"><span>→</span>ATOMIC TRANSACTIONS</span>
+    <span class="ti"><span>Py</span>VECTOR DATABASES</span>
+    <span class="ti"><span>→</span>IDEMPOTENCY KEYS</span>
+  </div>
+</div>
+
+<section class="section" id="about">
+  <div class="slabel">About</div>
+  <div class="about-grid">
+    <div class="about-text">
+      <h2>Reliable systems.<br>Real engineering.</h2>
+      <p>Self-taught backend engineer from Nigeria with a strong focus on building systems that work correctly under real conditions — not just in demos. I use <strong>Go as my primary language</strong> for APIs and backend services, and <strong>Python for AI integration, data pipelines, and automation.</strong></p>
+      <p>I've built financial systems with proper accounting models, AI pipelines that use real retrieval rather than naive prompting, and automation tools that scrape, enrich, and deliver data end-to-end. Everything is deployed, tested, and version-controlled.</p>
+      <p>Currently targeting backend engineering roles at startups and growing companies in Nigeria. Open to international remote positions for the right opportunity.</p>
+    </div>
+    <div>
+      <div class="stack-grid">
+        <div class="si"><div class="dot dg"></div>Go (primary)</div>
+        <div class="si"><div class="dot dg"></div>PostgreSQL</div>
+        <div class="si"><div class="dot db"></div>Python</div>
+        <div class="si"><div class="dot db"></div>FastAPI</div>
+        <div class="si"><div class="dot db"></div>LLM APIs</div>
+        <div class="si"><div class="dot db"></div>RAG Pipelines</div>
+        <div class="si"><div class="dot db"></div>Embeddings</div>
+        <div class="si"><div class="dot db"></div>Vector Search</div>
+        <div class="si"><div class="dot db"></div>Web Scraping</div>
+        <div class="si"><div class="dot db"></div>Semantic Search</div>
+        <div class="si"><div class="dot dd"></div>Docker</div>
+        <div class="si"><div class="dot dd"></div>GitHub Actions CI</div>
+        <div class="si"><div class="dot dd"></div>REST API Design</div>
+        <div class="si"><div class="dot dd"></div>System Design</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="slabel">Projects</div>
+
+  <div class="pcard feat">
+    <div class="plang">Go · PostgreSQL · Docker · GitHub Actions · Render</div>
+    <h3>ledger-core</h3>
+    <p>Production-grade double-entry ledger and wallet API. Every financial movement creates two immutable ledger entries — debit and credit. Balances are computed from the ledger, never stored. Transfers are atomic. All mutations are idempotent. Money stored as <code>int64</code> kobo — never float. Full integration test suite with CI on every push.</p>
+    <div class="ptags">
+      <span class="tag">double-entry accounting</span>
+      <span class="tag">idempotency keys</span>
+      <span class="tag">cursor pagination</span>
+      <span class="tag">ACID transactions</span>
+      <span class="tag">integration tests</span>
+      <span class="tag">live deployment</span>
+    </div>
+    <div class="plinks">
+      <a href="https://github.com/aluprince/ledger-core" target="_blank">↗ GitHub</a>
+      <a href="https://ledger-core-ksma.onrender.com/health" target="_blank">↗ Live API</a>
+    </div>
+  </div>
+
+  <div class="pcard">
+    <div class="plang">Python · LLM · Embeddings · Semantic Search · FastAPI</div>
+    <h3>sniperhire</h3>
+    <p>Resume parsing engine with AI-powered semantic scoring. Matches resumes to job descriptions using both LLM analysis and embedding similarity — cosine similarity scoring across vector representations, not keyword matching. Produces a structured score and gap analysis so candidates know exactly where they fall short.</p>
+    <div class="ptags">
+      <span class="tag">embedding models</span>
+      <span class="tag">semantic search</span>
+      <span class="tag">similarity scoring</span>
+      <span class="tag">LLM integration</span>
+      <span class="tag">NLP</span>
+    </div>
+    <div class="plinks">
+      <a href="https://github.com/aluprince" target="_blank">↗ GitHub</a>
+    </div>
+  </div>
+
+  <div class="pcard">
+    <div class="plang">Go · Python · LLM · Web Scraping · Telegram</div>
+    <h3>vector-vanguard</h3>
+    <p>Automated outreach pipeline. A Go-based web scraper collects structured data about target companies, feeds it to an LLM that generates tailored pitches based on the scraped context, then delivers everything via Telegram bot. The whole pipeline runs without manual intervention — scrape, enrich, deliver.</p>
+    <div class="ptags">
+      <span class="tag">web scraping</span>
+      <span class="tag">LLM enrichment</span>
+      <span class="tag">Go scraper</span>
+      <span class="tag">Telegram bot</span>
+      <span class="tag">pipeline automation</span>
+    </div>
+    <div class="plinks">
+      <a href="https://github.com/aluprince" target="_blank">↗ GitHub</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="decisions">
+  <div class="slabel">Engineering Decisions</div>
+  <h2>Why things are built the way they are.</h2>
+  <p style="color:var(--muted);margin-bottom:40px;max-width:560px;font-size:15px">The choices that separate production systems from demo projects.</p>
+  <div class="dgrid">
+    <div class="dcard">
+      <div class="dlbl">Money Storage</div>
+      <h4>Integers, not floats</h4>
+      <p><code>float64</code> arithmetic introduces precision errors that compound silently at volume. All monetary values are stored as <code>int64</code> in the smallest currency unit — always exact.</p>
+    </div>
+    <div class="dcard">
+      <div class="dlbl">Accounting Model</div>
+      <h4>Double-entry, always</h4>
+      <p>Every financial movement creates two ledger entries. No balance column is mutated directly. The ledger is append-only and immutable — the same model real banks use.</p>
+    </div>
+    <div class="dcard">
+      <div class="dlbl">API Safety</div>
+      <h4>Idempotency by default</h4>
+      <p>Mutation endpoints require an <code>Idempotency-Key</code>. Network retries cannot cause duplicate operations. The server stores and replays results without re-executing.</p>
+    </div>
+    <div class="dcard">
+      <div class="dlbl">AI Retrieval</div>
+      <h4>RAG over naive prompting</h4>
+      <p>LLMs hallucinate without grounding. Retrieval-augmented generation pulls real context from a knowledge base before generation — results are grounded in actual data.</p>
+    </div>
+    <div class="dcard">
+      <div class="dlbl">Search</div>
+      <h4>Embeddings over keywords</h4>
+      <p>Keyword matching misses synonyms, context, and intent. Embedding-based similarity search finds meaning — a search for "payments engineer" surfaces "fintech backend developer."</p>
+    </div>
+    <div class="dcard">
+      <div class="dlbl">Testing</div>
+      <h4>Real DB, not mocks</h4>
+      <p>Integration tests hit a real PostgreSQL instance with actual SQL constraints and ACID semantics. Mocks prove your mock works — real tests prove your system works.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="slabel">Contact</div>
+  <div class="cwrap">
+    <div>
+      <h2>Open to backend roles.</h2>
+      <p style="color:var(--muted);margin-top:14px;line-height:1.82;font-size:15px">Looking for backend engineering positions at startups and growing companies in Nigeria. Strong in Go and Python, financial systems, AI integration, and building things that actually work in production.</p>
+    </div>
+    <div class="clinks">
+      <a href="mailto:aluprince03@gmail.com" class="clink">
+        <div><div class="clbl">Email</div><div class="cval">aluprince03@gmail.com</div></div>
+        <span class="carr">→</span>
+      </a>
+      <a href="https://github.com/aluprince" target="_blank" class="clink">
+        <div><div class="clbl">GitHub</div><div class="cval">github.com/aluprince</div></div>
+        <span class="carr">→</span>
+      </a>
+      <a href="https://www.linkedin.com/in/alu-onari" target="_blank" class="clink">
+        <div><div class="clbl">LinkedIn</div><div class="cval">linkedin.com/in/alu-onari</div></div>
+        <span class="carr">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>alu prince · backend engineer · nigeria</p>
+  <p>Go · Python · PostgreSQL · AI Systems</p>
+</footer>
+
+<script>
+// API key handled server-side by proxy
+const SYS = `You are an AI assistant on Alu Prince's portfolio website. Answer questions about Alu honestly and concisely — 2-4 sentences max. Speak in third person.
+
+Alu Prince — Backend Engineer, Nigeria (Port Harcourt):
+- Self-taught, primary language Go, secondary Python
+- Builds: REST APIs, financial systems, AI pipelines, web scrapers, automation tools
+- Open to backend roles at Nigerian startups/fintechs and remote international positions
+
+Projects:
+1. ledger-core (Go) — Live double-entry ledger + wallet API at https://ledger-core-ksma.onrender.com. Integer money (kobo), idempotency, atomic transfers, cursor pagination, integration tests, CI/CD.
+2. sniperhire (Python) — Resume engine using LLM + embedding similarity scoring to match resumes to jobs. Cosine similarity, semantic search, gap analysis.
+3. vector-vanguard (Go+Python) — Automated pipeline: Go scraper → LLM enrichment → Telegram delivery.
+
+Technical skills: Go, Python, PostgreSQL (raw SQL, sqlc), FastAPI, Docker, GitHub Actions, REST API design, system design, LLM APIs (Groq/OpenAI/Anthropic), RAG pipelines, embedding models, semantic search, vector databases, similarity scoring, web scraping (Playwright/BeautifulSoup/Go), Telegram bots.
+
+Key strengths: Understands double-entry accounting, knows why float64 is wrong for money, builds real integration tests, implements RAG properly (not naive prompting), understands Nigerian payment infrastructure (Monnify, Paystack, Providus).
+
+If asked something not covered here, say you don't have that information and suggest contacting Alu directly.`;
+
+let busy = false;
+
+function addMsg(role, text) {
+  const el = document.createElement('div');
+  el.className = 'msg msg-' + role;
+  if (role === 'ai' && text === '...') el.classList.add('msg-dim');
+  el.textContent = text;
+  const box = document.getElementById('msgs');
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  return el;
+}
+
+function chip(btn) {
+  document.getElementById('cin').value = btn.textContent;
+  document.getElementById('chips').style.display = 'none';
+  send();
+}
+
+function hk(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+async function send() {
+  if (busy) return;
+  const inp = document.getElementById('cin');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  document.getElementById('chips').style.display = 'none';
+  addMsg('user', text);
+  busy = true;
+  document.getElementById('cbtn').disabled = true;
+  const thinking = addMsg('ai', '...');
+  try {
+    const res = await fetch('https://alu-chat-proxy.onrender.com/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'portfolio' },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        max_tokens: 180,
+        messages: [{ role: 'system', content: SYS }, { role: 'user', content: text }]
+      })
+    });
+    const data = await res.json();
+    thinking.textContent = res.ok ? data.choices[0].message.content : 'Something went wrong — try again.';
+    thinking.classList.remove('msg-dim');
+  } catch {
+    thinking.textContent = 'Network error — please try again.';
+    thinking.classList.remove('msg-dim');
+  }
+  busy = false;
+  document.getElementById('cbtn').disabled = false;
+  document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
+}
+</script>
+</body>
+</html>
